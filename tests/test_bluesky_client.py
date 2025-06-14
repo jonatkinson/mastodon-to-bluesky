@@ -1,6 +1,5 @@
 """Tests for the Bluesky client."""
 
-import json
 from datetime import datetime
 from unittest.mock import Mock, patch
 
@@ -95,40 +94,7 @@ class TestBlueskyClient:
         client.client.headers["Authorization"] = "Bearer test-jwt-token"
 
         # Need to implement mock
-        return  # Skip test for now
-        responses.add(
-            responses.POST,
-            "https://bsky.social/xrpc/com.atproto.repo.createRecord",
-            json={"uri": "at://example", "cid": "cid"},
-            status=200,
-        )
-
-        facets = [
-            {
-                "index": {"byteStart": 0, "byteEnd": 17},
-                "features": [
-                    {
-                        "$type": "app.bsky.richtext.facet#mention",
-                        "did": "did:plc:otheruser",
-                    }
-                ],
-            }
-        ]
-
-        post = BlueskyPost(
-            text="@other.bsky.social Hello!",
-            created_at=datetime.now(),
-            facets=facets,
-        )
-
-        result = client.create_post(post)
-        assert result is not None
-
-        # Verify facets in request
-        request = responses.calls[0].request
-        body = json.loads(request.body)
-        assert len(body["record"]["facets"]) == 1
-        assert body["record"]["facets"][0]["features"][0]["$type"] == "app.bsky.richtext.facet#mention"
+        pytest.skip("Test requires httpx mock implementation")
 
     def test_create_post_with_embed(self, client):
         """Test creating a post with media embed."""
@@ -136,110 +102,31 @@ class TestBlueskyClient:
         client.client.headers["Authorization"] = "Bearer test-jwt-token"
 
         # Need to implement mock
-        return  # Skip test for now
-        responses.add(
-            responses.POST,
-            "https://bsky.social/xrpc/com.atproto.repo.createRecord",
-            json={"uri": "at://example", "cid": "cid"},
-            status=200,
-        )
-
-        embed = {
-            "$type": "app.bsky.embed.images",
-            "images": [
-                {
-                    "alt": "Test image",
-                    "image": {
-                        "$type": "blob",
-                        "ref": {"$link": "bafkreiabc"},
-                        "mimeType": "image/jpeg",
-                        "size": 12345,
-                    },
-                }
-            ],
-        }
-
-        post = BlueskyPost(
-            text="Check out this image!",
-            created_at=datetime.now(),
-            embed=embed,
-        )
-
-        result = client.create_post(post)
-        assert result is not None
-
-        # Verify embed in request
-        request = responses.calls[0].request
-        body = json.loads(request.body)
-        assert body["record"]["embed"]["$type"] == "app.bsky.embed.images"
+        pytest.skip("Test requires httpx mock implementation")
 
     def test_upload_image_success(self, client):
         """Test successful image upload."""
         client.client.headers["Authorization"] = "Bearer test-jwt-token"
 
         # Need to implement mock
-        return  # Skip test for now
-        responses.add(
-            responses.POST,
-            "https://bsky.social/xrpc/com.atproto.repo.uploadBlob",
-            json={
-                "blob": {
-                    "$type": "blob",
-                    "ref": {"$link": "bafkreigxyz"},
-                    "mimeType": "image/jpeg",
-                    "size": 1234,
-                }
-            },
-            status=200,
-        )
-
-        blob = client.upload_image(b"fake image data", "image/jpeg")
-        assert blob is not None
-        assert blob["$type"] == "blob"
-        assert blob["mimeType"] == "image/jpeg"
-        assert blob["size"] == 1234
+        pytest.skip("Test requires httpx mock implementation")
 
     def test_upload_image_failure(self, client):
         """Test failed image upload."""
         client.client.headers["Authorization"] = "Bearer test-jwt-token"
 
         # Need to implement mock
-        return  # Skip test for now
-        responses.add(
-            responses.POST,
-            "https://bsky.social/xrpc/com.atproto.repo.uploadBlob",
-            status=500,
-        )
-
-        with pytest.raises(Exception):
-            client.upload_image(b"fake image data", "image/jpeg")
+        pytest.skip("Test requires httpx mock implementation")
 
     def test_resolve_handle_success(self, client):
         """Test successful handle resolution."""
         # Need to implement mock
-        return  # Skip test for now
-        responses.add(
-            responses.GET,
-            "https://bsky.social/xrpc/com.atproto.identity.resolveHandle",
-            json={"did": "did:plc:resolveduser"},
-            status=200,
-        )
-
-        did = client.resolve_handle("user.bsky.social")
-        assert did == "did:plc:resolveduser"
+        pytest.skip("Test requires httpx mock implementation")
 
     def test_resolve_handle_failure(self, client):
         """Test failed handle resolution."""
         # Need to implement mock
-        return  # Skip test for now
-        responses.add(
-            responses.GET,
-            "https://bsky.social/xrpc/com.atproto.identity.resolveHandle",
-            status=404,
-        )
-
-        did = client.resolve_handle("nonexistent.bsky.social")
-        assert did is None
+        pytest.skip("Test requires httpx mock implementation")
 
     def test_parse_mentions(self, client):
         """Test mention parsing."""
@@ -365,15 +252,4 @@ class TestBlueskyClient:
         client.client.headers["Authorization"] = "Bearer test-jwt-token"
 
         # Need to implement mock
-        return  # Skip test for now
-        responses.add(
-            responses.POST,
-            "https://bsky.social/xrpc/com.atproto.repo.createRecord",
-            json={"error": "InvalidRequest", "message": "Post too long"},
-            status=400,
-        )
-
-        post = BlueskyPost(text="Test post", created_at=datetime.now())
-
-        with pytest.raises(Exception):
-            client.create_post(post)
+        pytest.skip("Test requires httpx mock implementation")

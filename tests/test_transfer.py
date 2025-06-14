@@ -31,10 +31,9 @@ class TestTransferManager:
                 "size": 1234,
             }
         )
-        client.create_post = Mock(return_value={
-            "uri": "at://did:plc:user/app.bsky.feed.post/abc123",
-            "cid": "bafyreigxyz"
-        })
+        client.create_post = Mock(
+            return_value={"uri": "at://did:plc:user/app.bsky.feed.post/abc123", "cid": "bafyreigxyz"}
+        )
         client.create_rich_text = Mock(side_effect=lambda text: (text, []))
         return client
 
@@ -164,13 +163,14 @@ class TestTransferManager:
 
         # Verify success
         assert result is True
-        
+
         # Verify post was created
         mock_bluesky_client.create_post.assert_called_once()
         call_args = mock_bluesky_client.create_post.call_args[0][0]
         assert isinstance(call_args, BlueskyPost)
-        assert call_args.text == "Hello Bluesky!"
-        assert call_args.created_at == mastodon_post.created_at
+        assert call_args.text == "Hello Bluesky!\n\n[Originally posted: 2024-01-15 10:00 UTC]"
+        # Created at is set to current time, not mastodon post time
+        assert isinstance(call_args.created_at, datetime)
 
         # State is not updated by _transfer_post, only by transfer_posts
         # Just verify the transfer succeeded
@@ -189,7 +189,7 @@ class TestTransferManager:
         transfer_manager._transfer_post(mastodon_post)
 
         call_args = mock_bluesky_client.create_post.call_args[0][0]
-        assert call_args.text.startswith("CW: Content Warning\n\n")
+        assert call_args.text.startswith("CW: Content Warning\n\nSensitive content\n\n[Originally posted:")
 
     def test_transfer_post_long_text(self, transfer_manager, mock_bluesky_client):
         """Test transferring a post that needs to be split."""
@@ -261,6 +261,7 @@ class TestTransferManager:
         # Post should mention skipped video
         call_args = mock_bluesky_client.create_post.call_args[0][0]
         assert "[Media type 'video' not supported]" in call_args.text
+        assert "[Originally posted:" in call_args.text
 
     def test_transfer_post_dry_run(self, mock_mastodon_client, mock_bluesky_client, tmp_path):
         """Test dry run mode."""
@@ -392,33 +393,33 @@ class TestTransferManager:
             content="<p>This will fail</p>",
             url="https://mastodon.social/@user/123",
         )
-        
+
         # First attempt fails
         mock_bluesky_client.create_post.side_effect = Exception("API Error")
         result = transfer_manager._transfer_post(mastodon_post)
-        
+
         assert result is False
         assert "123" in transfer_manager.state.retry_queue
         assert "123" not in transfer_manager.state.transferred_ids
-        
+
         retry_info = transfer_manager.state.retry_queue["123"]
         assert retry_info.attempt_count == 1
         assert retry_info.error_type in ["api_error", "unknown"]
         assert retry_info.post_data == mastodon_post.model_dump(mode="json")
-        
+
         # Reset mock for successful retry
         mock_bluesky_client.create_post.side_effect = None
         mock_bluesky_client.create_post.return_value = {
             "uri": "at://did:plc:user/app.bsky.feed.post/abc123",
-            "cid": "bafyreigxyz"
+            "cid": "bafyreigxyz",
         }
-        
+
         # Set next_retry to now so it's ready to retry
         transfer_manager.state.retry_queue["123"].next_retry = datetime.now()
-        
+
         # Process retry queue
         stats = transfer_manager.process_retry_queue()
-        
+
         assert stats["retried"] == 1
         assert stats["succeeded"] == 1
         assert stats["failed"] == 0

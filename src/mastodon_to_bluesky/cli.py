@@ -85,12 +85,14 @@ def test_mastodon(
     config = load_config()
     instance = instance or config.get("mastodon_instance")
     token = token or config.get("mastodon_token")
-    
+
     if not instance or not token:
         console.print("[red]Error: Missing Mastodon instance or token[/red]")
-        console.print("Please provide --instance and --token or set MASTODON_INSTANCE and MASTODON_TOKEN environment variables")
+        console.print(
+            "Please provide --instance and --token or set MASTODON_INSTANCE and MASTODON_TOKEN environment variables"
+        )
         sys.exit(1)
-    
+
     console.print("[bold]Testing Mastodon API connection...[/bold]")
     console.print(f"Instance: {instance}")
 
@@ -186,12 +188,14 @@ def test_bluesky(handle: str, password: str, message: str):
     config = load_config()
     handle = handle or config.get("bluesky_handle")
     password = password or config.get("bluesky_password")
-    
+
     if not handle or not password:
         console.print("[red]Error: Missing Bluesky handle or password[/red]")
-        console.print("Please provide --handle and --password or set BLUESKY_HANDLE and BLUESKY_PASSWORD environment variables")
+        console.print(
+            "Please provide --handle and --password or set BLUESKY_HANDLE and BLUESKY_PASSWORD environment variables"
+        )
         sys.exit(1)
-    
+
     console.print("[bold]Testing Bluesky API connection...[/bold]")
     console.print(f"Handle: {handle}")
 
@@ -379,11 +383,13 @@ def transfer(
 
             # Run the transfer
             progress.update(task, description="Starting transfer...")
-        
+
         # First, process any posts in the retry queue
         retry_stats = transfer_manager.process_retry_queue()
         if retry_stats["retried"] > 0:
-            console.print(f"\n[yellow]Processed retry queue: {retry_stats['succeeded']} succeeded, {retry_stats['failed']} failed[/yellow]")
+            console.print(
+                f"\n[yellow]Processed retry queue: {retry_stats['succeeded']} succeeded, {retry_stats['failed']} failed[/yellow]"
+            )
 
         if interactive:
             # Use interactive mode
@@ -448,42 +454,42 @@ def transfer(
 def retry_failed(state_file: str):
     """Retry failed posts from the retry queue."""
     from pathlib import Path
-    
+
     from mastodon_to_bluesky.bluesky import BlueskyClient
     from mastodon_to_bluesky.mastodon import MastodonClient
     from mastodon_to_bluesky.transfer import TransferManager
 
     # Load config
     config = load_config()
-    
+
     # Check for required credentials
     mastodon_instance = config.get("mastodon_instance")
     mastodon_token = config.get("mastodon_token")
     bluesky_handle = config.get("bluesky_handle")
     bluesky_password = config.get("bluesky_password")
-    
+
     if not all([mastodon_instance, mastodon_token, bluesky_handle, bluesky_password]):
         console.print("[red]Error: Missing required credentials in config or environment[/red]")
         console.print("Please set up your configuration file or environment variables.")
         sys.exit(1)
-    
+
     try:
         # Create clients
         mastodon = MastodonClient(mastodon_instance, mastodon_token)
         bluesky = BlueskyClient(bluesky_handle, bluesky_password)
-        
+
         # Authenticate
         console.print("[yellow]Authenticating...[/yellow]")
         if not mastodon.verify_credentials():
             console.print("[red]Failed to authenticate with Mastodon[/red]")
             sys.exit(1)
-            
+
         if not bluesky.authenticate():
             console.print("[red]Failed to authenticate with Bluesky[/red]")
             sys.exit(1)
-            
+
         console.print("[green]✓ Authenticated successfully[/green]")
-        
+
         # Create transfer manager
         transfer_manager = TransferManager(
             mastodon_client=mastodon,
@@ -491,20 +497,20 @@ def retry_failed(state_file: str):
             state_file=Path(state_file),
             dry_run=False,
         )
-        
+
         # Process retry queue
         console.print("\n[bold]Processing retry queue...[/bold]")
         stats = transfer_manager.process_retry_queue()
-        
+
         # Display results
         console.print("\n[bold]Retry Summary:[/bold]")
         console.print(f"Posts retried: {stats['retried']}")
         console.print(f"Succeeded: {stats['succeeded']}")
         console.print(f"Failed: {stats['failed']}")
-        
-        if stats['failed'] > 0:
+
+        if stats["failed"] > 0:
             console.print("\n[yellow]Some posts still failed. They will be retried next time.[/yellow]")
-            
+
     except KeyboardInterrupt:
         console.print("\n[yellow]Retry interrupted by user[/yellow]")
         sys.exit(1)

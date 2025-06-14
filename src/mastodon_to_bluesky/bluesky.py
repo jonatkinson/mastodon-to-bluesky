@@ -1,4 +1,5 @@
 import re
+from datetime import UTC
 
 import httpx
 from rich.console import Console
@@ -44,10 +45,9 @@ class BlueskyClient:
             created_at = post.created_at.isoformat() + "Z"
         else:
             # Convert to UTC and format
-            from datetime import timezone
-            utc_time = post.created_at.astimezone(timezone.utc)
+            utc_time = post.created_at.astimezone(UTC)
             created_at = utc_time.isoformat().replace("+00:00", "Z")
-        
+
         record = {
             "$type": "app.bsky.feed.post",
             "text": post.text,
@@ -74,11 +74,11 @@ class BlueskyClient:
                 "record": record,
             },
         )
-        
+
         # Log error details if request fails
         if response.status_code != 200:
             console.print(f"[red]Error response: {response.text}[/red]")
-        
+
         response.raise_for_status()
 
         return response.json()

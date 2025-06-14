@@ -1,14 +1,11 @@
 """Tests for the Mastodon client."""
 
-from datetime import datetime
-from pathlib import Path
 from unittest.mock import Mock, patch
 
 import pytest
 from pytest_httpx import HTTPXMock
 
 from mastodon_to_bluesky.mastodon import MastodonClient
-from mastodon_to_bluesky.models import MastodonPost
 
 
 class TestMastodonClient:
@@ -47,7 +44,7 @@ class TestMastodonClient:
     # - test_get_posts_date_filter
     # - test_rate_limit_handling
     # - test_get_posts_with_media
-    
+
     # The get_posts method makes complex HTTP calls with pagination and filtering
     # that are difficult to mock reliably without essentially reimplementing the service
 

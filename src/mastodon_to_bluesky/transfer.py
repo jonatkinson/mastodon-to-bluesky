@@ -70,7 +70,7 @@ class TransferManager:
             include_replies=include_replies,
             include_boosts=include_boosts,
         )
-        
+
         # Convert iterator to list to get count and allow reversal
         posts = list(posts_iterator)
 
@@ -139,18 +139,18 @@ class TransferManager:
             # Handle content warnings
             if mastodon_post.spoiler_text:
                 text = f"CW: {mastodon_post.spoiler_text}\n\n{text}"
-            
+
             # Add original date to preserve timestamp information
             original_date = mastodon_post.created_at.strftime("%Y-%m-%d %H:%M UTC")
             text = f"{text}\n\n[Originally posted: {original_date}]"
-            
+
             # Add notes about unsupported media types
             if mastodon_post.media_attachments:
                 unsupported_types = set()
                 for attachment in mastodon_post.media_attachments:
                     if attachment["type"] != "image":
                         unsupported_types.add(attachment["type"])
-                
+
                 if unsupported_types:
                     for media_type in unsupported_types:
                         text += f"\n\n[Media type '{media_type}' not supported]"
@@ -172,6 +172,7 @@ class TransferManager:
                 # Create post
                 # Use current time as Bluesky doesn't support backdating
                 from datetime import datetime
+
                 bluesky_post = BlueskyPost(
                     text=post_text,
                     created_at=datetime.now(),
@@ -393,10 +394,10 @@ class TransferManager:
             try:
                 # Reconstruct the MastodonPost from stored data
                 post = MastodonPost(**retry_info.post_data)
-                
+
                 # Actually retry the transfer
                 success = self._transfer_post(post)
-                
+
                 if success:
                     # Remove from retry queue and mark as transferred
                     del self.state.retry_queue[post_id]
@@ -409,7 +410,7 @@ class TransferManager:
                 else:
                     # Transfer failed again - retry info will be updated by _add_to_retry_queue
                     stats["failed"] += 1
-                    
+
             except Exception as e:
                 console.print(f"[red]Error retrying post {post_id}: {str(e)}[/red]")
                 stats["failed"] += 1

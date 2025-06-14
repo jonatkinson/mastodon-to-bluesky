@@ -31,7 +31,7 @@ class MastodonClient:
         self.account_id = account["id"]
         console.print(f"[green]✓[/green] Authenticated as @{account['username']}")
         return account
-    
+
     def verify_credentials(self) -> bool:
         """Verify credentials. Returns True if successful."""
         try:
