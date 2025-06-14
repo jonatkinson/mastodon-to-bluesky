@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [0.1.0] - 2025-01-14
+## [1.0.0] - 2025-01-14
 
 ### Added
 - Initial release
@@ -31,5 +31,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Video and audio attachments are not supported
 - Some rich text formatting may be simplified
 
-[Unreleased]: https://github.com/jonatkinson/mastodon-to-bluesky/compare/v0.1.0...HEAD
-[0.1.0]: https://github.com/jonatkinson/mastodon-to-bluesky/releases/tag/v0.1.0
+[Unreleased]: https://github.com/jonatkinson/mastodon-to-bluesky/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/jonatkinson/mastodon-to-bluesky/releases/tag/v1.0.0

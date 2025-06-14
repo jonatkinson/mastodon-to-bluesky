@@ -58,7 +58,7 @@ uvx mastodon-to-bluesky transfer --help
 uvx mastodon-to-bluesky transfer --limit 10
 
 # Run a specific version
-uvx mastodon-to-bluesky@0.1.0 transfer --help
+uvx mastodon-to-bluesky@1.0.0 transfer --help
 ```
 
 ### Using pip
