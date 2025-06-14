@@ -1,4 +1,4 @@
-name: Release
+name: Publish Python Package
 
 on:
   push:
@@ -9,11 +9,11 @@ permissions:
   contents: read
 
 jobs:
-  release:
+  publish:
     runs-on: ubuntu-latest
     environment: release
     permissions:
-      id-token: write
+      id-token: write  # Required for trusted publishing
       
     steps:
     - uses: actions/checkout@v4
@@ -32,5 +32,4 @@ jobs:
       
     - name: Publish to PyPI
       uses: pypa/gh-action-pypi-publish@release/v1
-      with:
-        password: ${{ secrets.PYPI_API_TOKEN }}
+      # No password needed - uses trusted publishing
